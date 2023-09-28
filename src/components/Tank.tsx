@@ -1,11 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 
-const TankWrapper = styled.div`
+const TankWrapper = styled.div<{ position: { x: number; y: number } }>`
   width: 40px;
   height: 40px;
   background-color: #333;
   position: absolute;
+  left: ${({ position }) => Math.max(0, Math.min(760, position.x))}px;
+  top: ${({ position }) => Math.max(0, Math.min(560, position.y))}px;
 `;
 
 const TankGun = styled.div`
@@ -24,7 +26,7 @@ interface TankProps {
 
 const Tank: React.FC<TankProps> = ({ position }) => {
   return (
-    <TankWrapper style={{ left: position.x, top: position.y }}>
+    <TankWrapper position={position}>
       <TankGun />
     </TankWrapper>
   );

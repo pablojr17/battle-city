@@ -1,13 +1,57 @@
 import React, { useState, useEffect } from "react";
 import Tank from "../components/Tank";
 import Enemy from "../components/Enemy";
-import Bullet from "../components/Bullet"; // Importe o componente Bullet
+import Bullet from "../components/Bullet";
+import styled from "styled-components";
+
+const GameWrapper = styled.div`
+  position: relative;
+  width: 800px;
+  height: 600px;
+  margin: 0 auto;
+  background-color: #f0f0f0;
+  border: 3px solid #807b7b;
+  border-radius: 8px;
+`;
 
 const GameScene: React.FC = () => {
   const [tankPosition, setTankPosition] = useState({ x: 0, y: 0 });
   const [bullets, setBullets] = useState<
     { id: number; x: number; y: number }[]
   >([]);
+  const [enemyPosition, setEnemyPosition] = useState({ x: 100, y: 100 });
+
+  const checkCollision = () => {
+    bullets.forEach((bullet) => {
+      const bulletRect = {
+        left: bullet.x,
+        top: bullet.y,
+        right: bullet.x + 5,
+        bottom: bullet.y + 5,
+      };
+
+      const enemyRect = {
+        left: enemyPosition.x,
+        top: enemyPosition.y,
+        right: enemyPosition.x + 40,
+        bottom: enemyPosition.y + 40,
+      };
+
+      if (
+        bulletRect.left < enemyRect.right &&
+        bulletRect.right > enemyRect.left &&
+        bulletRect.top < enemyRect.bottom &&
+        bulletRect.bottom > enemyRect.top
+      ) {
+        onEnemyHit();
+      }
+    });
+  };
+
+  const onEnemyHit = () => {
+    setBullets([]);
+    setEnemyPosition({ x: Math.random() * 600, y: Math.random() * 400 }); // Reposiciona o inimigo aleatoriamente
+  };
 
   useEffect(() => {
     const handleSpaceBar = () => {
@@ -49,15 +93,6 @@ const GameScene: React.FC = () => {
     };
   }, [tankPosition, bullets]);
 
-  const handleTankShoot = () => {
-    const newBullet = {
-      id: bullets.length + 1,
-      x: tankPosition.x + 20, // Ajuste a posição inicial da bala conforme necessário
-      y: tankPosition.y,
-    };
-    setBullets([...bullets, newBullet]);
-  };
-
   useEffect(() => {
     const bulletInterval = setInterval(() => {
       setBullets((prevBullets) =>
@@ -65,28 +100,25 @@ const GameScene: React.FC = () => {
       );
     }, 100);
 
-    return () => clearInterval(bulletInterval);
-  }, []);
+    const collisionInterval = setInterval(() => {
+      checkCollision();
+    }, 100);
+
+    return () => {
+      clearInterval(bulletInterval);
+      clearInterval(collisionInterval);
+    };
+  }, [enemyPosition, bullets]);
 
   return (
-    <div>
+    <GameWrapper>
       <Tank position={tankPosition} />
-      <Enemy position={{ x: 100, y: 100 }} />
+      <Enemy position={enemyPosition} onHit={onEnemyHit} />
 
       {bullets.map((bullet) => (
-        <div
-          key={bullet.id}
-          style={{
-            position: "absolute",
-            left: bullet.x,
-            top: bullet.y,
-            width: "5px",
-            height: "5px",
-            background: "black",
-          }}
-        />
+        <Bullet key={bullet.id} position={bullet} />
       ))}
-    </div>
+    </GameWrapper>
   );
 };
 

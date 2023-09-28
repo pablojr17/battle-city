@@ -9,7 +9,9 @@ const BulletContainer = styled.div`
   position: absolute;
   width: 10px;
   height: 10px;
+  border-radius: 50%;
   background-color: yellow;
+  border: 2px solid #1100ff;
 `;
 
 const Bullet: React.FC<BulletProps> = ({ position }) => {
