@@ -6,8 +6,8 @@ import styled from "styled-components";
 
 const GameWrapper = styled.div`
   position: relative;
-  width: 800px;
-  height: 600px;
+  width: 640px;
+  height: 480px;
   margin: 0 auto;
   background-color: #f0f0f0;
   border: 3px solid #807b7b;
